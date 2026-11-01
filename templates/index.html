@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi App Termux - Premium</title>
+    <style>
+        /* Fondo moderno con degradado suave y estilizado */
+        body {
+            background: linear-gradient(135deg, #0f0f13, #1a1a24);
+            color: #ffffff;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+        }
+
+        /* Tarjeta principal con efecto de vidrio flotante */
+        .card {
+            background: rgba(42, 42, 53, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            max-width: 360px;
+            width: 90%;
+            margin-bottom: 20px;
+            transform: translateY(0);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:active {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 { 
+            color: #ffb703; 
+            margin-top: 0;
+            margin-bottom: 10px; 
+            font-size: 26px;
+            letter-spacing: -0.5px;
+        }
+        p { color: #adb5bd; font-size: 14px; margin-bottom: 25px; line-height: 1.5; }
+
+        /* Campos de texto refinados */
+        input {
+            width: 90%; 
+            padding: 12px; 
+            margin-bottom: 18px; 
+            border-radius: 8px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            background: #15151a; 
+            color: white;
+            font-size: 15px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: #ffb703;
+            box-shadow: 0 0 0 3px rgba(255, 183, 3, 0.2);
+        }
+
+        /* Botón de Enviar con animación de pulsación */
+        button {
+            background-color: #ffb703;
+            color: #0f0f13;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        button:active {
+            background-color: #e5a402;
+            transform: scale(0.98);
+        }
+
+        /* Tarjeta de registros de la Base de Datos */
+        .lista-card {
+            background: rgba(42, 42, 53, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 24px;
+            border-radius: 16px;
+            max-width: 360px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .lista-card h2 { color: #00f5d4; font-size: 18px; margin-top: 0; margin-bottom: 15px; letter-spacing: -0.3px; }
+
+        /* Botón de Excel estilizado e interactivo */
+        .btn-export {
+            display: block;
+            text-align: center;
+            background-color: #2ec4b6;
+            color: #0f0f13;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        .btn-export:active {
+            background-color: #25a195;
+            transform: scale(0.98);
+        }
+
+        ul { list-style: none; padding: 0; margin: 0; }
+        
+        /* Filas de la lista con transiciones de color */
+        li { 
+            padding: 12px; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
+            color: #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s ease;
+            border-radius: 6px;
+        }
+        li:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        li:last-child { border-bottom: none; }
+        
+        /* Botón eliminar minimalista */
+        .btn-delete {
+            color: #ff4d4d;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: bold;
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            padding: 5px 10px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        .btn-delete:active {
+            background-color: #ff4d4d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>¡Aplicación Lista!</h1>
+        <p>Ingresa tu nombre para guardarlo en la base de datos SQLite:</p>
+        
+        <form action="/saludo" method="POST">
+            <input type="text" name="usuario" placeholder="Escribe tu nombre aquí" required autocomplete="off">
+            <button type="submit">Enviar y Guardar</button>
+        </form>
+    </div>
+
+    <div class="lista-card">
+        <h2>Usuarios Registrados:</h2>
+        
+        <a href="/exportar" class="btn-export">📥 Exportar Lista a Excel (.CSV)</a>
+
+        <ul>
+            {% for id, nombre in usuarios %}
+                <li>
+                    <span>👤 {{ nombre }}</span>
+                    <a href="/eliminar/{{ id }}" class="btn-delete">Eliminar</a>
+                </li>
+            {% else %}
+                <li style="color: #adb5bd; font-style: italic; justify-content: center;">No hay usuarios registrados aún.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
