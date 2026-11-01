@@ -171,7 +171,10 @@
             {% for id, nombre in usuarios %}
                 <li>
                     <span>👤 {{ nombre }}</span>
-                    <a href="/eliminar/{{ id }}" class="btn-delete">Eliminar</a>
+                    <form action="/eliminar/{{ id }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn-delete">Eliminar</button>
+                    </form>
+
                 </li>
             {% else %}
                 <li style="color: #adb5bd; font-style: italic; justify-content: center;">No hay usuarios registrados aún.</li>
