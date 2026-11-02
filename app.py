@@ -38,14 +38,14 @@ def saludo():
         conn.close()
     return render_template('saludo.html', nombre=nombre_ingresado)
 
-@app.route('/eliminar/<int:usuario_id>')
+@app.route('/eliminar/<int:usuario_id>', methods=['POST'])
 def eliminar_usuario(usuario_id):
     conn = sqlite3.connect('usuarios.db')
     cursor = conn.cursor()
     cursor.execute('DELETE FROM personas WHERE id = ?', (usuario_id,))
     conn.commit()
     conn.close()
-    return redirect(url_for('hola_mundo'))
+    return redirect('/')
 
 # RUTA ACTUALIZADA: Exporta a formato CSV para Excel
 @app.route('/exportar')
