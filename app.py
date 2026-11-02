@@ -47,31 +47,37 @@ def eliminar_usuario(usuario_id):
     conn.close()
     return redirect('/')
 
-# RUTA ACTUALIZADA: Exporta a formato CSV para Excel
+# RUTA ACTUALIZADA PARA LA NUBE (RENDER)
 @app.route('/exportar')
 def exportar_datos():
+    import io
+    from flask import Response
+    
     conn = sqlite3.connect('usuarios.db')
     cursor = conn.cursor()
     cursor.execute('SELECT id, nombre FROM personas ORDER BY id ASC')
     filas = cursor.fetchall()
     conn.close()
 
-    # Definimos la ruta del archivo con extensión .csv en Descargas
-    ruta_excel = '/sdcard/Download/reporte_usuarios.csv'
+    # Generamos el CSV directamente en la memoria del servidor
+    output = io.StringIO()
+    escritor = csv.writer(output, delimiter=';') # Mantenemos el punto y coma para Excel
     
-    # Escribimos los datos usando el módulo CSV de Python
-    with open(ruta_excel, 'w', newline='', encoding='utf-8-sig') as f:
-        escritor = csv.writer(f, delimiter=';') # El punto y coma asegura compatibilidad directa en Excel
-        
-        # Escribimos los encabezados de las columnas
-        escritor.writerow(['ID Único', 'Nombre de Usuario'])
-        
-        # Escribimos todos los registros
-        for id_u, nombre_u in filas:
-            escritor.writerow([id_u, nombre_u])
-
-    # Enviamos el archivo listo para abrir en hojas de cálculo
-    return send_file(ruta_excel, as_attachment=True, download_name='reporte_usuarios.csv')
+    # Escribimos los encabezados
+    escritor.writerow(['ID Único', 'Nombre de Usuario'])
+    
+    # Escribimos todos los registros
+    for id_u, nombre_u in filas:
+        escritor.writerow([id_u, nombre_u])
+    
+    output.seek(0)
+    
+    # Enviamos el archivo en memoria directamente al navegador del usuario
+    return Response(
+        output.getvalue().encode('utf-8-sig'),
+        mimetype="text/csv",
+        headers={"Content-disposition": "attachment; filename=reporte_usuarios.csv"}
+    )
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
